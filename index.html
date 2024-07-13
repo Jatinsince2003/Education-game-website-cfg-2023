@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - codingnepalweb.com -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Website with Login & Registration Form</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Unicons -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css" />
+
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="new">
+        <a href="#" class="new_logo">Janajagriti Trust</a>
+
+        <ul class="new_items" style="display: none;">
+          <li class="new_item">
+            <a href="HomePage.html" class="new_link">Home</a>
+            <a href="#" class="new_link">Services</a>
+            <a href="/about us/about.html" class="new_link">About Us</a>
+            <a href="/contact us/contact.html" class="new_link">Contact</a>
+            <a href="leaderboard.html" class="new_link" id="LeaderBoard">LeaderBoard</a>
+            <a  href="" class="new_link" id="report">Report</a>
+          </li>
+        </ul>
+
+        <button class="button" id="form-open">Login</button>
+        <button class="button" id="userInfo"  ></button>
+      </nav>
+    </header>
+
+    <!-- Home -->
+    <section class="home" id="authsec">
+      <div class="form_container" id="formcon">
+        <i class="uil uil-times form_close"></i>
+        <!-- Login From -->
+        <div class="form login_form">
+          <form action="/" method="post" id="login-form">
+            <h2>Login</h2>
+
+            <div class="input_box">
+              <input  name="phone" id="phone" type="text" placeholder="Enter your phone" required />
+              <i class="uil uil-envelope-alt email"></i>
+            </div>
+            <div class="input_box">
+              <input  name="password" id="password" type="password" placeholder="Enter your password" required />
+              <i class="uil uil-lock password"></i>
+              <i class="uil uil-eye-slash pw_hide"></i>
+            </div>
+
+           
+
+            <button type="submit" class="button">Login Now</button>
+
+            <div class="login_signup">Don't have an account? <a href="#" id="signup">Signup</a></div>
+          </form>
+        </div>
+
+        <!-- Signup From -->
+        <div class="form signup_form">
+          <form action="/" method="post"  id="signup-form">
+            <h2>Signup</h2>
+
+            <div class="input_box">
+              <input type="text" name="fullname" id="signup-name" placeholder="Enter your full name" required />
+              <i class="uil uil-envelope-alt email"></i>
+            </div>
+          
+            <div class="input_box">
+              <input type="number"  name="age" id="signup-age" placeholder="Enter your age" required />
+            </div>
+            <div class="input_box">
+              <input type="number" name="phone" id="signup-phone" placeholder="Enter parent's mobile Number" required />
+            </div>
+            <div class="input_box">
+              <input type="password" name="password" id="signup-password" placeholder="Create password" required />
+              <i class="uil uil-lock password"></i>
+              <i class="uil uil-eye-slash pw_hide"></i>
+            </div>
+            <div class="option_field">
+              <span class="checkbox">
+                <input type="checkbox" id="check" name="role"/>
+                <label for="check">Admin</label>
+              </span>
+            </div>
+            <button type="submit" class="button">Signup Now</button>
+
+            <div class="login_signup">Already have an account? <a href="#" id="login">Login</a></div>
+          </form>
+        </div>
+      </div>
+    </section>
+    
+    
+    <script>
+       let loggedinUser="";
+      let userId="";
+      let userRole="";
+      window.onload = function() {
+  if(sessionStorage.getItem('LoggedInUserName')!=="")
+  {
+    const userName=document.getElementById("userInfo");
+      userName.textContent=sessionStorage.getItem('LoggedInUserName');
+     
+  }
+  
+  if(sessionStorage.getItem('LoggedInUserRole')==="admin")
+      {
+        document.getElementById("report").setAttribute("href",'/report');
+      }
+  
+}
+ 
+      const formOpenBtn = document.querySelector("#form-open"),
+  home = document.querySelector(".home"),
+  formContainer = document.querySelector(".form_container"),
+  formCloseBtn = document.querySelector(".form_close"),
+  signupBtn = document.querySelector("#signup"),
+  loginBtn = document.querySelector("#login"),
+  pwShowHide = document.querySelectorAll(".pw_hide");
+
+formOpenBtn.addEventListener("click", () => home.classList.add("show"));
+formCloseBtn.addEventListener("click", () => home.classList.remove("show"));
+
+pwShowHide.forEach((icon) => {
+  icon.addEventListener("click", () => {
+    let getPwInput = icon.parentElement.querySelector("input");
+    if (getPwInput.type === "password") {
+      getPwInput.type = "text";
+      icon.classList.replace("uil-eye-slash", "uil-eye");
+    } else {
+      getPwInput.type = "password";
+      icon.classList.replace("uil-eye", "uil-eye-slash");
+    }
+  });
+});
+
+signupBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  formContainer.classList.add("active");
+});
+loginBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  formContainer.classList.remove("active");
+});
+
+
+document.getElementById("login-form").addEventListener("submit", login);
+document.getElementById("signup-form").addEventListener("submit", signup);
+
+function login(event) {
+  event.preventDefault();
+  const phone = document.getElementById("phone").value;
+  const password = document.getElementById("password").value;
+
+  // Send login data to the server for verification
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phone, password })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Login successful!");
+      const loginButton=document.getElementById("form-open");
+      loginButton.style.display="none";
+      loggedinUser=data.user.fullname;
+      userId=data.user._id
+      userRole=data.user.role;
+      sessionStorage.setItem('LoggedInUserId', userId);
+      sessionStorage.setItem('LoggedInUserName', loggedinUser);
+      sessionStorage.setItem('LoggedInUserRole',userRole);
+      const userName=document.getElementById("userInfo");
+      userName.textContent=sessionStorage.getItem('LoggedInUserName');
+      
+      
+      // console.log(" LocalStorage "+localStorage.getItem('LoggedInUserId'));
+      const info=document.getElementById("userInfo");
+      info.textContent=data.user.fullname;
+
+      if(sessionStorage.getItem('LoggedInUserRole')==="admin")
+      {
+        document.getElementById("report").setAttribute("href",'/report');
+      }
+
+
+      console.log(data);
+      console.log(loggedinUser,userId);
+      window.location.href="HomePage.html";
+    } else {
+      alert("Login failed. Please try again.");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  });
+}
+
+function signup(event) {
+  event.preventDefault();
+  const fullname = document.getElementById("signup-name").value;
+  const age = document.getElementById("signup-age").value;
+  const phone = document.getElementById("signup-phone").value;
+  const password = document.getElementById("signup-password").value;
+  const score=0;
+  let role="user";
+  var checkbox=document.getElementById("check");
+  if (checkbox.checked){
+    role="admin"
+  }
+  // Send signup data to the server for storing in the database
+  fetch("/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ fullname,age,phone,password,score,role})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Signup successful!");
+      window.location.href="/";
+      // Perform any additional actions after signup
+    } else {
+      alert("Signup failed. Please try again.");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  });
+}
+
+
+    </script>
+  </body>
+</html>
